@@ -31,6 +31,19 @@ import '../screens/reports/stocks_screen.dart';
 import '../screens/reports/supply_customer_screen.dart';
 import '../screens/reports/tax_report_screen.dart';
 import '../screens/reports/trending_products_screen.dart';
+import '../screens/sell/add_draft_screen.dart';
+import '../screens/sell/add_quotation_screen.dart';
+import '../screens/sell/add_screen.dart';
+import '../screens/sell/all_screen.dart';
+import '../screens/sell/discount_screen.dart';
+import '../screens/sell/import_screen.dart';
+import '../screens/sell/list_drafts_screen.dart';
+import '../screens/sell/list_pos_screen.dart';
+import '../screens/sell/list_quotation_screen.dart';
+import '../screens/sell/list_return_screen.dart';
+import '../screens/sell/order_screen.dart';
+import '../screens/sell/pos_screen.dart';
+import '../screens/sell/shipment_screen.dart';
 import '../tabs/contacts_screen.dart';
 import '../tabs/expenses_screen.dart';
 import '../tabs/products_screen.dart';
@@ -109,6 +122,21 @@ class MyApp extends StatelessWidget {
         ReportTaxScreen.routeName: (ctx) => const ReportTaxScreen(),
         ReportTrendingProductScreen.routeName: (ctx) =>
             const ReportTrendingProductScreen(),
+        SellAddDraftScreen.routeName: (ctx) => const SellAddDraftScreen(),
+        SellAddQuotationScreen.routeName: (ctx) =>
+            const SellAddQuotationScreen(),
+        SellAddScreen.routeName: (ctx) => const SellAddScreen(),
+        SellAllScreen.routeName: (ctx) => const SellAllScreen(),
+        SellDiscountScreen.routeName: (ctx) => const SellDiscountScreen(),
+        SellImportScreen.routeName: (ctx) => const SellImportScreen(),
+        SellListDraftScreen.routeName: (ctx) => const SellListDraftScreen(),
+        SellListPosScreen.routeName: (ctx) => const SellListPosScreen(),
+        SellListQuotationScreen.routeName: (ctx) =>
+            const SellListQuotationScreen(),
+        SellListReturnScreen.routeName: (ctx) => const SellListReturnScreen(),
+        SellOrderScreen.routeName: (ctx) => const SellOrderScreen(),
+        SellPOSScreen.routeName: (ctx) => const SellPOSScreen(),
+        SellShipmentScreen.routeName: (ctx) => const SellShipmentScreen(),
       },
     );
   }
@@ -125,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final _passwordFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
 
-  bool _visibility = false;
+  final bool _visibility = false;
   String _username = "null";
   String _password = "null";
 

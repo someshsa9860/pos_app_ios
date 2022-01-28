@@ -3,7 +3,7 @@ import 'package:pos_app/widgets/app_drawer.dart';
 
 class SellAddScreen extends StatelessWidget {
   const SellAddScreen({Key? key}) : super(key: key);
-  static const routeName = '/sell-';
+  static const routeName = '/sell-add';
 
   @override
   Widget build(BuildContext context) {

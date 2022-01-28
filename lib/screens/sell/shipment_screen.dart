@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
 
-class SellAddScreen extends StatelessWidget {
-  const SellAddScreen({Key? key}) : super(key: key);
-  static const routeName = '/sell-';
+class SellShipmentScreen extends StatelessWidget {
+  const SellShipmentScreen({Key? key}) : super(key: key);
+  static const routeName = '/sell-shipment';
 
   @override
   Widget build(BuildContext context) {
