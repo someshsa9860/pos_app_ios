@@ -1,0 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:pos_app/widgets/app_drawer.dart';
+
+class PurchaseListScreen extends StatelessWidget {
+  const PurchaseListScreen({Key? key}) : super(key: key);
+  static const routeName = '/purchase-list';
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      drawer: AppDrawer(),
+    );
+  }
+}
