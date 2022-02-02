@@ -4,7 +4,7 @@ import 'package:pos_app/screens/purchases/list_screen.dart';
 import 'package:pos_app/screens/purchases/orders_screen.dart';
 import 'package:pos_app/screens/purchases/return_list_screen.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
-import 'package:pos_app/widgets/content_list_item.dart';
+import 'package:pos_app/widgets/list_items.dart';
 
 class PurchasesScreen extends StatelessWidget {
   static const routeName = '/purchases';

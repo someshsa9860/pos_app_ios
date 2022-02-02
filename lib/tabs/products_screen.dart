@@ -10,7 +10,7 @@ import 'package:pos_app/screens/products/units_screen.dart';
 import 'package:pos_app/screens/products/variations_screen.dart';
 import 'package:pos_app/screens/products/warranties_screen.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
-import 'package:pos_app/widgets/content_list_item.dart';
+import 'package:pos_app/widgets/list_items.dart';
 
 class ProductsScreen extends StatelessWidget {
   const ProductsScreen({Key? key}) : super(key: key);

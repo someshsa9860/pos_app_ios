@@ -18,7 +18,7 @@ import '../screens/reports/supply_customer_screen.dart';
 import '../screens/reports/tax_report_screen.dart';
 import '../screens/reports/trending_products_screen.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/content_list_item.dart';
+import '../widgets/list_items.dart';
 
 class ReportsScreen extends StatelessWidget {
   static const routeName = '/reports';

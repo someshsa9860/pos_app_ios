@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
-import '../widgets/content_list_item.dart';
+import '../widgets/list_items.dart';
 
 import '../screens/contacts/customers_screen.dart';
 import '../screens/contacts/group_screen.dart';
@@ -49,7 +49,7 @@ class ContactsScreen extends StatelessWidget {
               }),
         ],
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
     );
   }
 }

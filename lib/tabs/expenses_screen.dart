@@ -4,7 +4,7 @@ import 'package:pos_app/widgets/app_drawer.dart';
 import '../screens/expenses/add_screen.dart';
 import '../screens/expenses/categories_screen.dart';
 import '../screens/expenses/list_screen.dart';
-import '../widgets/content_list_item.dart';
+import '../widgets/list_items.dart';
 
 class ExpensesScreen extends StatelessWidget {
   const ExpensesScreen({Key? key}) : super(key: key);

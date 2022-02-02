@@ -14,7 +14,7 @@ import '../screens/sell/order_screen.dart';
 import '../screens/sell/pos_screen.dart';
 import '../screens/sell/shipment_screen.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/content_list_item.dart';
+import '../widgets/list_items.dart';
 
 class SellScreen extends StatelessWidget {
   static const routeName = '/sell';
