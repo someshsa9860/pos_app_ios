@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_app/widgets/app_drawer.dart';
 
 class ContentListItem extends StatelessWidget {
   final IconData icon;
@@ -14,11 +15,15 @@ class ContentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      onTap: onClick,
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(icon),
+          title: Text(title),
+          onTap: onClick,
+        ),
+        const Divider(),
+      ],
     );
   }
 }
@@ -40,17 +45,27 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return ListTile(
-      leading: IconButton(onPressed: onClickIcon, icon: Icon(icon)),
-      title: Text(title),
-      onTap: onClickItem,
+    return Column(
+      children: [
+        ListTile(
+          trailing: IconButton(
+              onPressed: onClickIcon,
+              icon: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.secondary,
+              )),
+          leading: Text(title),
+          onTap: onClickItem,
+        ),
+        const Divider(),
+      ],
     );
   }
 }
 
 class ViewItem extends StatelessWidget {
-  final String keyText;
-  final String valueText;
+  final keyText;
+  final valueText;
 
   const ViewItem({Key? key, required this.keyText, required this.valueText})
       : super(key: key);
@@ -58,10 +73,44 @@ class ViewItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return ListTile(
-      leading: Text(keyText.replaceAll("_", " ").replaceFirst(keyText.substring(0,1), keyText.substring(0,1).toString().toUpperCase())),
-      trailing: Text(valueText),
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              keyText.toString().replaceAll("_", " ").replaceFirst(
+                  keyText.substring(0, 1),
+                  keyText.substring(0, 1).toString().toUpperCase()),
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              valueText.toString(),
+              textAlign: TextAlign.left,
+              style: const TextStyle(fontWeight: FontWeight.w300),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  String getText(String valueText) {
+    return valueText
+        .replaceAll("_", " ")
+        .replaceAll(']', '')
+        .replaceAll('{', '')
+        .replaceAll('}', '')
+        .replaceAll('[', '')
+        .split(',')
+        .join('\n');
   }
 }
 
@@ -73,11 +122,13 @@ class MapUnit {
 }
 
 class ViewPageItem extends StatelessWidget {
+  final List<MapUnit> list;
 
-  final List<MapUnit> list ;
   final String title;
+  final String mapKey;
 
-  const ViewPageItem({Key? key, required this.list, required this.title})
+  const ViewPageItem(
+      {Key? key, required this.list, required this.title, this.mapKey = ''})
       : super(key: key);
 
   @override
@@ -88,11 +139,19 @@ class ViewPageItem extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: ListView.builder(
-        itemCount: list.length,
-          itemBuilder: (ctx, index) => ViewItem(
-              keyText: list.elementAt(index).key,
-              valueText: list.elementAt(index).value)),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView.builder(
+              itemCount: list.length,
+              itemBuilder: (ctx, index) {
+                return ViewItem(
+                    keyText: list.elementAt(index).key,
+                    valueText: list.elementAt(index).value);
+              }),
+        ),
+      ),
+      drawer: const AppDrawer(),
     );
   }
 }

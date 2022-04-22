@@ -1,145 +1,162 @@
-import 'dart:convert';
+import "dart:convert";
 
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
-import 'package:pos_app/api/api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:flutter/cupertino.dart";
+import "package:http/http.dart" as http;
+import 'package:pos_app/data_management/api.dart';
+import "package:shared_preferences/shared_preferences.dart";
+
+import "../data_management/user.dart";
 
 enum AuthStatus {
   authenticated,
   unAuthenticated,
+  unAuthenticating,
   authenticating,
   unInitialized,
 }
 
 class AuthProvider extends ChangeNotifier {
-  AuthStatus _status = AuthStatus.unInitialized;
-  var _info;
-  var username;
-  var password;
+  var _info = "";
 
-  AuthStatus get status => _status;
+  AuthStatus status = AuthStatus.unInitialized;
 
   String get info => _info;
-  String api = 'http://pospoa.com/pos/oauth/token';
+  String api = "https://pospoa.com/pos/oauth/token";
+
+  final User _user = User();
 
   initAuthProvider() async {
-    var tok = await getToken();
+    var tok = await getUser();
 
     if (tok != null) {
-      token = tok;
-      _status = AuthStatus.authenticated;
+      status = AuthStatus.authenticated;
+      notifyListeners();
     } else {
-      _status = AuthStatus.unAuthenticated;
+      status = AuthStatus.unAuthenticated;
     }
     notifyListeners();
   }
 
   setHeader() => {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
+        "Content-type": "application/json",
+        "Accept": "application/json",
       };
 
   Future<bool> login(String username, String password) async {
-    _status = AuthStatus.authenticating;
+    status = AuthStatus.authenticating;
     var url = api;
-
-    this.username = username;
-    this.password = password;
+    notifyListeners();
+    _user.username = username;
+    _user.password = password;
     Map<String, dynamic> body = {
-      'grant_type': 'password',
-      'client_id': '4',
-      'client_secret': 'kXXMnZ7eQ6ZXJ4hOpSQVMysphrlOINdTic0HQrO5',
-      'username': username,
-      'password': password,
-      'scope': '',
+      "grant_type": "password",
+      "client_id": "4",
+      "client_secret": "kXXMnZ7eQ6ZXJ4hOpSQVMysphrlOINdTic0HQrO5",
+      "username": username,
+      "password": password,
+      "scope": "",
     };
 
-    _info = 'Server error';
+    _info = "Server error";
     try {
       var response = await http.post(Uri.parse(url),
           headers: setHeader(), body: jsonEncode(body));
 
       Map<String, dynamic> result = json.decode(response.body);
 
-      print(result.toString());
       if (response.statusCode == 200) {
-        _info = 'Authenticated';
-        _status = AuthStatus.authenticated;
-        token = result['token'];
-        storeData(result);
+        _info = "Authenticated";
+        _user.token = result["access_token"];
+        _user.id = result["id"];
+        _user.token = result["access_token"];
+        _user.expiresIn = DateTime.now()
+            .add(Duration(seconds: int.parse(result["expires_in"].toString())))
+            .toIso8601String();
 
+        status = AuthStatus.authenticated;
+        storeData(result);
         notifyListeners();
         return true;
+      } else {
+        _info = result["message"];
+        notifyListeners();
       }
 
       if (response.statusCode == 401) {
-        _info = 'invalid username or password';
-        _status = AuthStatus.unAuthenticated;
+        _info = "invalid username or password";
+        status = AuthStatus.unAuthenticated;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _info = e.toString();
+      _info = "Please connect to internet";
+      notifyListeners();
     }
 
-    _status = AuthStatus.unAuthenticated;
+    status = AuthStatus.unAuthenticated;
     notifyListeners();
     return false;
   }
 
-  getToken() async {
+  getUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var v = preferences.getString('token');
-    return await getExpiry(v);
+
+    var v = preferences.getString("user");
+    if (v == null||v.isEmpty) {
+      return null;
+    }
+
+    var userData = jsonDecode(v);
+    _user.username = userData["username"];
+    _user.password = userData["password"];
+    _user.token = userData["token"];
+    _user.id = userData["id"];
+    _user.expiresIn = userData["expiresIn"];
+
+    if (_user.expiresIn != null) {
+      if (DateTime.parse(_user.expiresIn!).isBefore(DateTime.now())) {
+        //_token = _user.token;
+        return null;
+      }
+    }
+    return _user;
   }
 
   getUsername() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var username = preferences.getString('username');
+    var username = preferences.getString("username");
     return username;
-  }
-
-  getExpiry(token) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var expiresIn = preferences.getInt('expires_in');
-    var time = preferences.getString('time');
-    if (time == null) {
-      return null;
-    }
-    var duration = DateTime.now().difference(DateTime.parse(time));
-    print(duration.inSeconds);
-    print(duration.inMilliseconds);
-    print(expiresIn);
-    if (duration.inSeconds > (expiresIn ?? 0)) {
-      return null;
-    }
-    return token;
   }
 
   getPassword() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var v = preferences.getString('password');
+    var v = preferences.getString("password");
     return v;
   }
 
-  void storeData(Map<String, dynamic> result) async {
+  storeData(Map<String, dynamic> result) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setString('token', result['access_token']);
-    await preferences.setString('username', username);
-    await preferences.setString('password', password);
-    await preferences.setString('time', DateTime.now().toString());
-    await preferences.setInt('expires_in', result['expires_in']);
+    await preferences.setString("user", _user.toJson);
   }
 
-  logout([bool tokenExpired = false]) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    _status = AuthStatus.unAuthenticated;
-    if (tokenExpired) {
-      _info = 'Session Expired. Please Login Again';
-      login(await getUsername(), await getPassword());
-    }
+  logout() async {
+    status = AuthStatus.unAuthenticating;
+    _info = "";
+    user.token=null;
     notifyListeners();
-    await preferences.clear();
+
+    status = AuthStatus.unAuthenticated;
+    _info = "";
+    notifyListeners();
+  }
+
+  expired() async {
+    status = AuthStatus.unAuthenticated;
+    _info = "Session Expired. Please Login Again";
+    await getUser();
+    await login(_user.username ?? "", _user.password ?? "");
+
+    notifyListeners();
+    //await preferences.clear();
   }
 }

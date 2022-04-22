@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pos_app/provider/contact_provider.dart';
-import 'package:pos_app/screens/contacts/supplier_screen.dart';
+import 'package:pos_app/provider/customer_provider.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
-import 'package:pos_app/widgets/list_items.dart';
+import 'package:pos_app/widgets/refresh_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'add_contact_screen.dart';
@@ -12,71 +12,57 @@ class ContactsCustomersScreen extends StatefulWidget {
   static const routeName = '/contacts-customers';
 
   @override
-  State<ContactsCustomersScreen> createState() => _ContactsCustomersScreenState();
+  State<ContactsCustomersScreen> createState() => _Screen();
 }
 
-class _ContactsCustomersScreenState extends State<ContactsCustomersScreen> {
+class _Screen extends State<ContactsCustomersScreen> {
   @override
   Widget build(BuildContext context) {
-    final contacts = Provider.of<ContactsProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Customer"),
+        title: Text(appBarName),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AddContact.routeName,arguments: [ContactType.customer,-1]);
-              },
-              icon: const Icon(Icons.add)),
-          PopupMenuButton(
-              itemBuilder: (ctx) => [
-                const PopupMenuItem(
-                  child: Text('Export to CSV'),
-                  value: Menu.csv,
-                ),
-                const PopupMenuItem(
-                  child: Text('Export to Excel'),
-                  value: Menu.excel,
-                ),
-                const PopupMenuItem(
-                  child: Text('Print'),
-                  value: Menu.print,
-                ),
-                const PopupMenuItem(
-                  child: Text('Column Visibility'),
-                  value: Menu.colVis,
-                ),
-                const PopupMenuItem(
-                  child: Text('Export to PDF'),
-                  value: Menu.pdf,
-                ),
-              ])
+     //     IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+          IconButton(onPressed: () => addEdit(-1), icon: const Icon(Icons.add)),
         ],
       ),
-      body: ListView.builder(
-          itemCount: contacts.mapSupplyer.length,
-          itemBuilder: (ctx, index) {
-            return ListItem(
-                icon: Icons.edit,
-                title: contacts.getField('contact_id', index) ?? "nucll",
-                onClickItem: () {
-                  final List<MapUnit> listMap = [];
-                  Map<String, dynamic> map = contacts.mapSupplyer[index];
-                  map.forEach((key, value) {
-                    if (value != null) {
-                      listMap.add(MapUnit(key, value.toString()));
-                    }
-                  });
-                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
-                    return ViewPageItem(
-                        list: listMap,
-                        title:
-                        contacts.getField('contact_id', index) ?? "null");
-                  }));
-                },
-                onClickIcon: () {});
-          }),
+      body: Consumer<CustomerProvider>(
+        builder: (BuildContext context, contacts, Widget? child) {
+          return RefreshIndicator(
+            onRefresh: () => refresh(contacts),
+            child: getLength(contacts) == 0
+                ? const Center(
+                    child: MyCustomProgressBar(
+                    msg: 'waiting response from server',
+                  ))
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: LayoutBuilder(
+                          builder: (BuildContext context,
+                              BoxConstraints constraints) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _title(
+                                    'Contact Id', constraints.maxWidth * 0.15),
+                                _title('Business Name',
+                                    constraints.maxWidth * 0.15),
+                                _title('Name', constraints.maxWidth * 0.15),
+                                _title('Email', constraints.maxWidth * 0.15),
+                                _title('Edit', constraints.maxWidth * 0.15),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(child: buildListView(contacts, context)),
+                    ],
+                  ),
+          );
+        },
+      ),
       drawer: const AppDrawer(),
     );
   }
@@ -87,11 +73,195 @@ class _ContactsCustomersScreenState extends State<ContactsCustomersScreen> {
   void didChangeDependencies() {
     if (_isInit) {
       _isInit = false;
-      final contacts = Provider.of<ContactsProvider>(context, listen: false);
-      contacts.getContactSupplyer();
+      final contacts = Provider.of<CustomerProvider>(context, listen: false);
+      refresh(contacts);
     }
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
 
+  //screen-specific-changes
+
+  final String appBarName = 'Customer';
+
+  //swipe-refresh
+  Future<void> refresh(CustomerProvider contacts) async {
+    await contacts.getData();
+    await contacts.sync();
+  }
+
+  void addEdit(index) {
+    Navigator.of(context).pushNamed(AddContact.routeName,
+        arguments: [ContactType.customer, index]);
+  }
+
+  setListForMenu(CustomerProvider value) {
+    return value.mapData;
+  }
+
+  getLength(CustomerProvider contacts) {
+    return contacts.mapData.length;
+  }
+
+  String get titleKey => 'name';
+
+  Map<String, dynamic> getMapForFunction(CustomerProvider contacts, int index) {
+    return contacts.mapData[index];
+  }
+
+  Widget buildListView(CustomerProvider providerData, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView.builder(
+          itemCount: getLength(providerData),
+          itemBuilder: (ctx, index) {
+            return LayoutBuilder(
+              builder: (ctx, constraint) {
+                return Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (ctx) {
+                          return _ViewPage(
+                              map: getMapForFunction(providerData, index),
+                              title:
+                                  providerData.mapData[index][titleKey] ?? '');
+                        }));
+                      },
+                      child: Row(
+                        children: [
+                          _item(constraint.maxWidth * 0.2, 'Contact ID:',
+                              'contact_id', providerData.mapData[index]),
+                          _item(
+                              constraint.maxWidth * 0.2,
+                              'Business Name:',
+                              'supplier_business_name',
+                              providerData.mapData[index]),
+                          _item(constraint.maxWidth * 0.2, 'Full Name:', 'name',
+                              providerData.mapData[index]),
+                          _item(constraint.maxWidth * 0.2, 'Email:', 'email',
+                              providerData.mapData[index]),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          addEdit(index);
+                        },
+                        icon: const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(
+                            Icons.edit_outlined,
+                            color: Colors.black45,
+                          ),
+                        )),
+                  ],
+                );
+              },
+            );
+          }),
+    );
+  }
+
+  Widget _item(width, title1, key1, map, {prefix1}) {
+    return SizedBox(
+        width: width,
+        child: Text(
+          prefix1 != null
+              ? '$prefix1 ${getValue(map, key1)}'
+              : '' + (getValue(map, key1)),
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontWeight: FontWeight.w300),
+        ));
+  }
+
+  _title(String v, double size) {
+    return SizedBox(
+      width: size,
+      child: Text(v),
+    );
+  }
+}
+
+class _ViewPage extends StatelessWidget {
+  final Map<String, dynamic> map;
+
+  final String title;
+
+  const _ViewPage({Key? key, required this.map, required this.title})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+            children: [
+              _item(context, 'Contact ID:', 'contact_id'),
+              _item(context, 'Full Name:', 'name'),
+              _item(context, 'Contact Status:', 'contact_status'),
+              _item(context, 'Email:', 'email'),
+              _item(context, 'Mobile number:', 'mobile'),
+              _item(context, 'Address line1:', 'address_line_1'),
+              _item(context, 'Address line2:', 'address_line_2'),
+              _item(context, 'Pay Term:', 'pay_term_number'),
+              _item(context, 'Tax No.:', 'tax_number'),
+              _item(context, 'Credit Limit:', 'credit_limit', prefix1: 'Ksh'),
+              _item(context, 'Balance:', 'balance', prefix1: 'Ksh'),
+              _item(context, 'Added On:', 'created_at'),
+              _item(context, 'Updated At.:', 'updated_at'),
+            ],
+          ),
+        ),
+      ),
+      drawer: const AppDrawer(),
+    );
+  }
+
+  Widget _item(BuildContext context, title1, key1, {prefix1}) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              title1,
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              prefix1 != null
+                  ? '$prefix1 ${getValue(map, key1)}'
+                  : '' + (getValue(map, key1)),
+              textAlign: TextAlign.left,
+              style: const TextStyle(fontWeight: FontWeight.w300),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String getValue(Map<String, dynamic> map, String key) {
+  if (map.containsKey(key) &&
+      map[key] != null &&
+      map[key].toString().isNotEmpty) {
+    return map[key].toString().trim().isEmpty ? '0.0' : map[key].toString();
+  }
+  return 'unavailable';
 }
