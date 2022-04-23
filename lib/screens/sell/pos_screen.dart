@@ -42,7 +42,7 @@ import 'package:pos_app/widgets/app_drawer.dart';
 import 'package:pos_app/widgets/border_row.dart';
 import 'package:pos_app/widgets/pos_search.dart';
 import 'package:pos_app/widgets/special_design.dart';
-import 'package:printer_one/printer_one.dart';
+
 import 'package:provider/provider.dart';
 import 'package:search_page/search_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1264,14 +1264,14 @@ class POSState extends State<POSScreen> {
     try {
       switch (defaultPrinter) {
         case DefaultPrinters.cs30:
-          var list = await genInvoiceSDK();
+          //var list = await genInvoiceSDK();
           //var pdf = await printPDF(list);
-          printSDKOne(list);
+          //printSDKOne(list);
           break;
         case DefaultPrinters.cs10:
-          var list = await genInvoiceSDK();
+          //var list = await genInvoiceSDK();
 
-          printSDKTwo(list);
+          //printSDKTwo(list);
           break;
         case DefaultPrinters.bluetooth:
           Fluttertoast.showToast(msg: 'printing');
@@ -1976,223 +1976,7 @@ class POSState extends State<POSScreen> {
     return posLines;
   }
 
-  Future<List<POSLine>> genInvoiceSDK() async{
-    if (initData['invoice_no'] == null) {
-      initData['invoice_no'] = await getInvoiceNum();
-    }
 
-    final supplier = Provider.of<SupplierProvider>(context, listen: false);
-    final customer = Provider.of<CustomerProvider>(context, listen: false);
-    final contactsData = getMapContacts(supplier, customer);
-
-    List<POSLine> posLines = [];
-    posLines.addAll(sellInvoiceHeadSDK(
-        Provider.of<HeadersFootersProvider>(context, listen: false).headers));
-
-    //DATA STAR
-
-    posLines.add(POSLine(
-      col1: '',
-      col2: '',
-      col3: 'RECEIPT',
-      col4: '',
-      format: '%${math.max(1,((26-('RECEIPT').length)/2).toInt())}s %1s %-${math.max(1,math.min(28,((26-('RECEIPT').length)).toInt()))}s %1s %${math.max(1,((26-('RECEIPT').length)/2).toInt())}s ',
-      col5: '',
-      bold: true.toString(),
-      font: fontLarge,
-      bitmap: '',
-    ));
-    posLines.add(POSLine(
-        col1: 'Receipt No.',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-1s %1s %1s %1s %-15s',
-        col5: initData['invoice_no'].toString(),
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-
-    posLines.add(POSLine(
-        col1: 'Date',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-4s %1s %1s %1s %15s',
-        col5: (initData['transaction_date'] ??
-            DateFormat('MM/dd/yyyy HH:mm').format(DateTime.now()))
-            .toString(),
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-
-    posLines.add(POSLine(
-        col1: 'Customer',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-1s %1s %1s %1s %-15s',
-        col5: trim(initData['contact_id'] == null
-            ? ''
-            : contactsData.elementAt(contactsData.indexWhere((element) =>
-        element['id'].toString() ==
-            initData['contact_id'].toString()))['name'] ??
-            ''),
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-
-    posLines.add(POSLine(
-        col1: '------------------------',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-24s %1s %1s %1s %1s',
-        col5: '',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: '',
-        col2: '',
-        col3: 'Qty',
-        col4: 'price',
-        format: '%-1s %-1s %-4s %10s %12s',
-        col5: 'total',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: '------------------------',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-24s %1s %1s %1s %1s',
-        col5: '',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    for (Map<String, dynamic> map in mapProductList) {
-      posLines.add(POSLine(
-          col1: (mapProductList.indexOf(map) + 1).toString(),
-          col2: trim2(map['name']),
-          col3: '',
-          col4:'',
-          format: '%-3s %-22s %-1s %1s %1s',
-          col5:'',
-
-          bold: false.toString(),
-          font: 'small',
-          bitmap: ''));
-
-      posLines.add(POSLine(
-          col1: '',
-          col2: '',
-          col3: map['quantity'].toString(),
-          col4: (double.tryParse(map['unit_price'].toString()) ?? 0.0)
-              .toStringAsFixed(2),
-          format: '%-1s %-1s %-4s %10s %12s',
-          col5:(getSubTotal(
-            0,
-            map['quantity'] ?? 0,
-            map['unit_price'] ?? 0,
-            discount,
-            discountType,
-          )),
-
-          bold: false.toString(),
-          font: 'small',
-          bitmap: ''));
-    }
-    posLines.add(POSLine(
-        col1: '------------------------',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-24s %1s %1s %1s %1s',
-        col5: '',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: ' ',
-        col2: ' ',
-        col3: ' ',
-        col4: 'Subtotal:',
-        format: '%-1s %1s %1s %-9s %16s',
-        col5: 'Ksh ${(total).toStringAsFixed(2)}',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: ' ',
-        col2: ' ',
-        col3: ' ',
-        col4: 'Discount:',
-        format: '%-1s %1s %1s %-10s %15s',
-        col5: '-Ksh ${calDiscount.toStringAsFixed(2)}',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: ' ',
-        col2: ' ',
-        col3: ' ',
-        col4: 'Tax($taxName):',
-        format: '%-1s %1s %1s %-10s %15s',
-        col5: '+Ksh ${(calTax).toStringAsFixed(2)}',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-
-    // posLines.add(POSLine(
-    //     col1: ' ',
-    //     col2: ' ',
-    //     col3: ' ',
-    //     col4: 'Shipping Charge:',
-    //     format: '%-4s %1s %1s %-15s %9s',
-    //     col5:
-    //     '+Ksh ${(initData['shipping_charges'] ?? 0.0).toStringAsFixed(2)}',
-    //     bold: false.toString(),
-    //     font: 'small',
-    //     bitmap: ''));
-
-    posLines.add(POSLine(
-        col1: ' ',
-        col2: ' ',
-        col3: ' ',
-        col4: 'Total:',
-        format: '%-1s %1s %1s %-6s %19s',
-        col5:
-        '+Ksh ${(total - calDiscount + calTax).toStringAsFixed(2)}',
-        bold: true.toString(),
-        font: fontLarge,
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: ' ',
-        col2: ' ',
-        col3: ' ',
-        col4: 'Payment Method:',
-        format: '%-1s %1s %1s %-15s %10s',
-        col5: '${initData['method']}',
-        bold: true.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.add(POSLine(
-        col1: '------------------------',
-        col2: '',
-        col3: '',
-        col4: '',
-        format: '%-24s %1s %1s %1s %1s',
-        col5: '',
-        bold: false.toString(),
-        font: 'small',
-        bitmap: ''));
-    posLines.addAll(sellInvoiceBottomSDK(
-        Provider.of<HeadersFootersProvider>(context, listen: false).footers));
-
-    return posLines;
-  }
 
   double getDiscount(qty0, price0, discount0, type) {
     var qty = double.tryParse(qty0.toString()) ?? 0.0;

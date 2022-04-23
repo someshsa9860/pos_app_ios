@@ -50,8 +50,7 @@ dependencies:
   flutter_barcode_scanner: ^2.0.0
   path_provider: ^2.0.9
 
-  printer_one:
-    path: ../plugins/printer_one
+
 
   pdf: ^3.7.1
   permission_handler: ^8.3.0

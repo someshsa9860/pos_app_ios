@@ -34,7 +34,6 @@ import 'package:pos_app/widgets/app_drawer.dart';
 import 'package:pos_app/widgets/border_row.dart';
 import 'package:pos_app/widgets/custom_card.dart';
 import 'package:pos_app/widgets/pos_search.dart';
-import 'package:printer_one/printer_one.dart';
 import 'package:provider/provider.dart';
 import 'package:search_page/search_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -816,14 +815,14 @@ class _Screen extends State<SellAddScreen> {
     try {
       switch (defaultPrinter) {
         case DefaultPrinters.cs30:
-          var list = genInvoiceSDK();
+         // var list = genInvoiceSDK();
           //var pdf = await printPDF(list);
-          printSDKOne(list);
+//          printSDKOne(list);
           break;
         case DefaultPrinters.cs10:
-          var list = genInvoiceSDK();
+        //  var list = genInvoiceSDK();
 
-          printSDKTwo(list);
+//          printSDKTwo(list);
           break;
 
         case DefaultPrinters.bluetooth:
@@ -1483,138 +1482,7 @@ class _Screen extends State<SellAddScreen> {
     return posLines;
   }
 
-  List<POSLine> genInvoiceSDK()
-  // {
-  //   if (initData['invoice_no'] == null) {
-  //     initData['invoice_no'] = getRandomId();
-  //   }
-  //
-  //   final supplier = Provider.of<SupplierProvider>(context, listen: false);
-  //   final customer = Provider.of<CustomerProvider>(context, listen: false);
-  //
-  //   List<POSLine> posLines = [];
-  //   posLines.addAll(sellInvoiceHeadSDK(
-  //       Provider.of<HeadersFootersProvider>(context, listen: false).headers));
-  //
-  //   //DATA START
-  //
-  //   posLines.add(POSLine(
-  //       left: 'Receipt',
-  //       center: '',
-  //       end: '',
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: 'Receipt No.',
-  //       center: '',
-  //       end: initData['invoice_no'].toString(),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: 'Date',
-  //       center: '',
-  //       end: (initData['transaction_date'] ??
-  //               DateFormat('MM/dd/yyyy HH:mm').format(DateTime.now()))
-  //           .toString(),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   final contactsData = getMapContacts(supplier, customer);
-  //
-  //   posLines.add(POSLine(
-  //       left: 'Customer',
-  //       center: '',
-  //       end: initData['contact_id'] == null
-  //           ? ''
-  //           : contactsData.elementAt(contactsData.indexWhere((element) =>
-  //                   element['id'].toString() ==
-  //                   initData['contact_id'].toString()))['name'] ??
-  //               '',
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: '',
-  //       end: '',
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '#  Product',
-  //       center: 'Quantity   Unit price',
-  //       end: 'sub-total',
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //
-  //   for (Map<String, dynamic> map in mapProductList) {
-  //     posLines.add(POSLine(
-  //         left: (mapProductList.indexOf(map) + 1).toString() +
-  //             map['name'].toString().substring(
-  //                 0, math.min(map['name'].toString().length - 1, 20)),
-  //         center: map['quantity'].toString() +
-  //             (double.tryParse(map['unit_price'].toString()) ?? 0.0)
-  //                 .toStringAsFixed(2),
-  //         end: (map['sub_total']).toStringAsFixed(2),
-  //         bold: false.toString(),
-  //         font: 'small',
-  //         bitmap: ''));
-  //   }
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: 'Subtotal:  Ksh ',
-  //       end: (total).toStringAsFixed(2),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: '',
-  //       end: (total).toStringAsFixed(2),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: 'Discount:  -Ksh ',
-  //       end: (discount).toStringAsFixed(2),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: 'Tax($taxName):  +Ksh ',
-  //       end: (calTax).toStringAsFixed(2),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: 'Shipping Charge:  +Ksh ',
-  //       end: (initData['shipping_charges'] ?? 0.0).toStringAsFixed(2),
-  //       bold: false.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //   posLines.add(POSLine(
-  //       left: '',
-  //       center: 'Total:  Ksh ',
-  //       end: '' + (totalPayable).toStringAsFixed(2),
-  //       bold: true.toString(),
-  //       font: 'small',
-  //       bitmap: ''));
-  //
-  //   posLines.addAll(sellInvoiceBottomSDK(
-  //       Provider.of<HeadersFootersProvider>(context, listen: false).footers));
-  //
-  //   return posLines;
-  // }
 
-  {
-    return [];
-  }
   String get items {
     var value = 0;
     for (Map<String, dynamic> product in mapProductList) {

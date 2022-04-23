@@ -9,7 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pos_app/widgets/app_drawer.dart';
 import 'package:pos_app/widgets/custom_card.dart';
-import 'package:printer_one/printer_one.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BluetoothScreen extends StatefulWidget {
@@ -118,17 +118,17 @@ class BluetoothScreenState extends State<BluetoothScreen>
                                   }),
                             ],
                           ),
-                          Row(
-                            children: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    _devices = [];
-
-                                    getPairedDevices();
-                                  },
-                                  child: const Text('paired devices')),
-                            ],
-                          ),
+                          // Row(
+                          //   children: [
+                          //     ElevatedButton(
+                          //         onPressed: () {
+                          //           _devices = [];
+                          //
+                          //           getPairedDevices();
+                          //         },
+                          //         child: const Text('paired devices')),
+                          //   ],
+                          // ),
                         ],
                       ),
                       Row(
@@ -314,7 +314,7 @@ class BluetoothScreenState extends State<BluetoothScreen>
     }
     _devices = [];
 
-    getPairedDevices();
+    //getPairedDevices();
   }
 
   void save() async {
@@ -325,40 +325,40 @@ class BluetoothScreenState extends State<BluetoothScreen>
     preferences.setString('blue_device', jsonEncode(_dev!.toJson()));
   }
 
-  getPairedDevices() async {
-    var on = await _flutterBlue.isOn;
-    if (!on) {
-      Fluttertoast.showToast(msg: 'please turn on bluetooth');
-      return;
-    }
-
-    _controller.reset();
-    _controller.forward();
-    try {
-      List<Object?>? clist = await PrinterOne.bluetooth;
-
-      if (clist != null && clist.isNotEmpty) {
-        for (var result in clist) {
-          result as Map<Object?, Object?>;
-          var item = PrinterBluetooth(basic.BluetoothDevice.fromJson({
-            'name': result['name'],
-            'address': result['address'],
-            'type': result['type'],
-            'connected': true,
-          }));
-
-          var index =
-              _devices.indexWhere((element) => element.address == item.address);
-          if (index == -1) {
-            _devices.add(item);
-          }
-        }
-        setState(() {
-          _devices = _devices.toSet().toList();
-        });
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    }
-  }
+  // getPairedDevices() async {
+  //   var on = await _flutterBlue.isOn;
+  //   if (!on) {
+  //     Fluttertoast.showToast(msg: 'please turn on bluetooth');
+  //     return;
+  //   }
+  //
+  //   _controller.reset();
+  //   _controller.forward();
+  //   try {
+  //     List<Object?>? clist = await PrinterOne.bluetooth;
+  //
+  //     if (clist != null && clist.isNotEmpty) {
+  //       for (var result in clist) {
+  //         result as Map<Object?, Object?>;
+  //         var item = PrinterBluetooth(basic.BluetoothDevice.fromJson({
+  //           'name': result['name'],
+  //           'address': result['address'],
+  //           'type': result['type'],
+  //           'connected': true,
+  //         }));
+  //
+  //         var index =
+  //             _devices.indexWhere((element) => element.address == item.address);
+  //         if (index == -1) {
+  //           _devices.add(item);
+  //         }
+  //       }
+  //       setState(() {
+  //         _devices = _devices.toSet().toList();
+  //       });
+  //     }
+  //   } catch (e) {
+  //     Fluttertoast.showToast(msg: e.toString());
+  //   }
+  // }
 }

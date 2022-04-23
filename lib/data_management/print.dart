@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:printer_one/printer_one.dart';
+
 import 'package:share/share.dart';
 
 import '../data_management/sync.dart';
@@ -67,14 +67,7 @@ pdfShare(String path) async {
 }
 
 //for cs30
-printSDKOne(List<POSLine> posLines) async {
-  List<Map<String, String>> lines = [];
-  for (POSLine posLine in posLines) {
-    lines.add(posLine.toMap());
-  }
 
-  await PrinterOne.printOne(lines);
-}
 
 const String leftKey = "left";
 const String centerKey = "center";
@@ -85,51 +78,7 @@ const String fontSmall = "small";
 const String fontLarge = "large";
 const String bitmapKey = "bitmap";
 
-printSDKTwo(List<POSLine> posLines) async {
-  List<Map<String, String>> lines = [];
-  for (POSLine posLine in posLines) {
-    lines.add(posLine.toMap());
-  }
 
-  await PrinterOne.printTwo(lines);
-}
-
-List<POSLine> sellInvoiceHeadSDK(List<String> list) {
-  return list
-      .map(
-        (e) => POSLine(
-            col1: ' ',
-            col2: ' ',
-            col3: e,
-            col4: '',
-            format: '%${max(1,((26-e.length)/2).toInt())}s %1s %-${max(1, min(28,((26-e.length)).toInt()))}s %1s %1s ',
-
-            col5: '',
-            bold: false.toString(),
-            font: fontLarge,
-            bitmap: ''),
-      )
-      .toList();
-}
-
-List<POSLine> sellInvoiceBottomSDK(List<String> list) {
-  return list
-      .map(
-        (e) => POSLine(
-            col1: ' ',
-            col2: ' ',
-            col3: e,
-            col4: '',
-            format: '%${max(1,((26-e.length)/2).toInt())}s %1s %-${max(1, min(28,((26-e.length)).toInt()))}s %1s %1s ',
-
-            col5: '',
-
-            bold: false.toString(),
-            font: fontLarge,
-            bitmap: ''),
-      )
-      .toList();
-}
 
 List<pw.Widget> sellInvoiceHead(List<String> list) {
   return list
