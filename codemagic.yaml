@@ -1,5 +1,5 @@
 workflows:
-  hello-world:
-    name: Hello world workflow
+  my-workflow:
     scripts:
-      - echo "Hello World!"
+      - name: Build for iOS
+        script: flutter build ios
